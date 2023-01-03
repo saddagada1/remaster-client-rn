@@ -83,31 +83,6 @@ const Portal: React.FC<PortalProps> = ({ width, height, keys }) => {
     };
   }, []);
 
-  //   useEffect(() => {
-  //     if (animsEnded === keys.length * 2) {
-  //       setAnimsEnded(0);
-  //       setAnimate(false);
-  //     }
-  //   }, [animsEnded]);
-
-  //   useEffect(() => {
-  //     let runAnim: NodeJS.Timeout | null = null;
-
-  //     if (!animate) {
-  //       console.log("timeout set");
-  //       runAnim = setTimeout(() => {
-  //         setAnimate(true);
-  //       }, 1000 * 30);
-  //     } else {
-  //       console.log("anim start");
-  //       animateCircles();
-  //     }
-
-  //     return () => {
-  //       runAnim && clearTimeout(runAnim);
-  //     };
-  //   }, [animate]);
-
   return (
     <View className="w-full h-full">
       <Canvas style={{ flex: 1 }}>
