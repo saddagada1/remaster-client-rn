@@ -15,8 +15,14 @@ import Animated, {
   withDelay,
   withSpring,
 } from "react-native-reanimated";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AuthStackParams } from "../../Navigators/AuthStackNavigator";
+import { useIsFocused } from '@react-navigation/native';
 
-const Onboarding: React.FC = () => {
+type OnboardingProps = NativeStackScreenProps<AuthStackParams, "Onboarding">;
+
+const Onboarding: React.FC<OnboardingProps> = ({navigation}) => {
+  const isFocused = useIsFocused();
   const [portalWidth, setPortalWidth] = useState(0);
   const [portalHeight, setPortalHeight] = useState(0);
   const uiRevealTranslateY = useSharedValue(50);
@@ -112,6 +118,7 @@ const Onboarding: React.FC = () => {
                 width={portalWidth}
                 height={portalHeight}
                 keys={Object.keys(keyColourReference)}
+                animate={isFocused}
               />
             ) : null}
           </Animated.View>
@@ -126,7 +133,7 @@ const Onboarding: React.FC = () => {
         />
       </View>
       <Animated.View className="w-full items-center my-10" style={uiRevealBottomAnimStyles}>
-        <Pressable className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black">
+        <Pressable className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black" onPress={() => navigation.push("Register")}>
           <Icon name="envelope" size={20} color="#fff" />
           <TypographyBold
             style={{ fontSize: 15, color: "#fff", marginLeft: 15 }}
@@ -142,7 +149,7 @@ const Onboarding: React.FC = () => {
         </Pressable>
         <View className="flex-row mb-3">
           <Typography>Already have an account?</Typography>
-          <Pressable onPress={() => console.log("sign in")}>
+          <Pressable onPress={() => navigation.push("Login")}>
             <TypographyBold
               style={{ marginLeft: 5, textDecorationLine: "underline" }}
             >

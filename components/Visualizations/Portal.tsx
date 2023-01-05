@@ -12,6 +12,7 @@ import {
   runTiming,
   Rect,
   SweepGradient,
+  SkiaAnimation,
 } from "@shopify/react-native-skia";
 import { keyColourReference } from "../../utils/constants";
 import { rand } from "../../utils/rand";
@@ -20,10 +21,10 @@ interface PortalProps {
   width: number;
   height: number;
   keys: string[];
+  animate: boolean;
 }
 
-const Portal: React.FC<PortalProps> = ({ width, height, keys }) => {
-  const [animate, setAnimate] = useState(true);
+const Portal: React.FC<PortalProps> = ({ width, height, keys, animate }) => {
   const circlePositions = keys.map(() => {
     const circleXPosition = useValue(rand(0, width));
     const circleYPosition = useValue(rand(0, height));
@@ -38,50 +39,48 @@ const Portal: React.FC<PortalProps> = ({ width, height, keys }) => {
     }, [circlePositions[index][0], circlePositions[index][1]]);
     return radialPosition;
   });
+  const [timings, setTimings] = useState<SkiaAnimation[][]>([]);
 
-  const animateCircle = (
-    x: SkiaMutableValue<number>,
-    y: SkiaMutableValue<number>
-  ) => {
-    const animateX = () => {
-      const randomX = rand(0, width);
-      runTiming(
-        x,
-        randomX,
-        { duration: Math.abs(((x.current - randomX) / 10) * 500) },
-        () => {
-          animate && animateX();
-        }
-      );
-    };
-    const animateY = () => {
-      const randomY = rand(0, height);
-      runTiming(
-        y,
-        randomY,
-        { duration: Math.abs(((y.current - randomY) / 10) * 500) },
-        () => {
-          animate && animateY();
-        }
-      );
-    };
-    animateX();
-    animateY();
+  const createXTiming = (x: SkiaMutableValue<number>) => {
+    const randomX = rand(0, width);
+    const timing = runTiming(
+      x,
+      { to: randomX, loop: true, yoyo: true },
+      { duration: Math.abs(((x.current - randomX) / 10) * 1000) },
+    );
+
+    return timing;
   };
 
-  const animateCircles = () => {
-    keys.map((_, index) => {
-      animateCircle(circlePositions[index][0], circlePositions[index][1]);
-    });
+  const createYTiming = (y: SkiaMutableValue<number>) => {
+    const randomY = rand(0, height);
+    const timing = runTiming(
+      y,
+      { to: randomY, loop: true, yoyo: true },
+      { duration: Math.abs(((y.current - randomY) / 10) * 1000) },
+    );
+
+    return timing;
   };
 
   useEffect(() => {
-    animateCircles();
-
-    return () => {
-      setAnimate(false);
-    };
-  }, []);
+    if (animate) {
+      setTimings(
+        keys.map((_, index) => {
+          return [
+            createXTiming(circlePositions[index][0]),
+            createYTiming(circlePositions[index][1]),
+          ];
+        })
+      );
+    } else {
+      timings.length !== 0 && timings.map((timing) => {
+        timing[0].cancel();
+        timing[1].cancel();
+      });
+      setTimings([]);
+    }
+  }, [animate]);
 
   return (
     <View className="w-full h-full">

@@ -1,12 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Header from "../../Header/Header";
 import { NativeStackScreenProps } from "@react-navigation/native-stack/lib/typescript/src/types";
-import { StackParams } from "../../Navigator/Navigator";
+import { AuthStackParams } from "../../Navigators/AuthStackNavigator";
 import Container from "../../Container/Container";
 import Navbar from "../../Navbar/Navbar";
 
-type HomeProps = NativeStackScreenProps<StackParams, "Home">;
+type HomeProps = NativeStackScreenProps<AuthStackParams, "Login">;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
   return (
@@ -18,5 +17,3 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
 };
 
 export default Home;
-
-const styles = StyleSheet.create({});

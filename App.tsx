@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import Navigator from './components/Navigator/Navigator';
+import AuthStackNavigator from './components/Navigators/AuthStackNavigator';
 import { useFonts } from 'expo-font';
 
 export default function App() {
@@ -15,7 +15,7 @@ export default function App() {
     fontsLoaded ?
     <NavigationContainer>
       <StatusBar style="auto" />
-      <Navigator/>
+      <AuthStackNavigator/>
     </NavigationContainer>
     : null
   );
