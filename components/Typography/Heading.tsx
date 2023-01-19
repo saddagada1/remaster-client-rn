@@ -3,12 +3,15 @@ import React from "react";
 
 interface HeadingProps {
   children: React.ReactNode;
-  style?: StyleProp<TextStyle>
+  style?: StyleProp<TextStyle>;
+  className?: string;
 }
 
-const Heading: React.FC<HeadingProps> = ({children, style}) => {
+const Heading: React.FC<HeadingProps> = ({ children, style, className }) => {
   return (
-    <Text style={[{fontFamily: "Syne"}, style]}>{children}</Text>
+    <Text className={className} style={[{ fontFamily: "Syne" }, style]}>
+      {children}
+    </Text>
   );
 };
 

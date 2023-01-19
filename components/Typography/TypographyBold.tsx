@@ -3,12 +3,19 @@ import React from "react";
 
 interface TypographyBoldProps {
   children: React.ReactNode;
-  style?: StyleProp<TextStyle>
+  style?: StyleProp<TextStyle>;
+  className?: string;
 }
 
-const TypographyBold: React.FC<TypographyBoldProps> = ({children, style}) => {
+const TypographyBold: React.FC<TypographyBoldProps> = ({
+  children,
+  style,
+  className,
+}) => {
   return (
-    <Text style={[{fontFamily: "InterBold"}, style]}>{children}</Text>
+    <Text className={className} style={[{ fontFamily: "InterBold" }, style]}>
+      {children}
+    </Text>
   );
 };
 

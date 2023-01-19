@@ -3,12 +3,19 @@ import React from "react";
 
 interface TypographyProps {
   children: React.ReactNode;
-  style?: StyleProp<TextStyle>
+  style?: StyleProp<TextStyle>;
+  className?: string;
 }
 
-const Typography: React.FC<TypographyProps> = ({children, style}) => {
+const Typography: React.FC<TypographyProps> = ({
+  children,
+  style,
+  className,
+}) => {
   return (
-    <Text style={[{fontFamily: "Inter"}, style]}>{children}</Text>
+    <Text className={className} style={[{ fontFamily: "Inter" }, style]}>
+      {children}
+    </Text>
   );
 };
 

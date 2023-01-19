@@ -17,11 +17,11 @@ import Animated, {
 } from "react-native-reanimated";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParams } from "../../Navigators/AuthStackNavigator";
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 type OnboardingProps = NativeStackScreenProps<AuthStackParams, "Onboarding">;
 
-const Onboarding: React.FC<OnboardingProps> = ({navigation}) => {
+const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [portalWidth, setPortalWidth] = useState(0);
   const [portalHeight, setPortalHeight] = useState(0);
@@ -33,19 +33,15 @@ const Onboarding: React.FC<OnboardingProps> = ({navigation}) => {
 
   const uiRevealTopAnimStyles = useAnimatedStyle(() => {
     return {
-      transform: [
-        { translateY: uiRevealTranslateY.value * -1 }
-      ],
-      opacity: uiRevealOpacity.value
+      transform: [{ translateY: uiRevealTranslateY.value * -1 }],
+      opacity: uiRevealOpacity.value,
     };
   });
 
   const uiRevealBottomAnimStyles = useAnimatedStyle(() => {
     return {
-      transform: [
-        { translateY: uiRevealTranslateY.value }
-      ],
-      opacity: uiRevealOpacity.value
+      transform: [{ translateY: uiRevealTranslateY.value }],
+      opacity: uiRevealOpacity.value,
     };
   });
 
@@ -132,8 +128,14 @@ const Onboarding: React.FC<OnboardingProps> = ({navigation}) => {
           style={portalRevealRightAnimStyles}
         />
       </View>
-      <Animated.View className="w-full items-center my-10" style={uiRevealBottomAnimStyles}>
-        <Pressable className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black" onPress={() => navigation.push("Register")}>
+      <Animated.View
+        className="w-full items-center my-10"
+        style={uiRevealBottomAnimStyles}
+      >
+        <Pressable
+          className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black"
+          onPress={() => navigation.push("Register")}
+        >
           <Icon name="envelope" size={20} color="#fff" />
           <TypographyBold
             style={{ fontSize: 15, color: "#fff", marginLeft: 15 }}
@@ -153,7 +155,7 @@ const Onboarding: React.FC<OnboardingProps> = ({navigation}) => {
             <TypographyBold
               style={{ marginLeft: 5, textDecorationLine: "underline" }}
             >
-              Sign In
+              Login
             </TypographyBold>
           </Pressable>
         </View>
