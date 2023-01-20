@@ -1,10 +1,4 @@
-import {
-  View,
-  Pressable,
-  TextInput,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { View, Pressable, TextInput, StyleSheet } from "react-native";
 import React from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParams } from "../../Navigators/AuthStackNavigator";
@@ -16,6 +10,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 import Title from "../../Typography/Title";
 import { Formik } from "formik";
 import * as yup from "yup";
+import LoadingIndicator from "../../Visualizations/LoadingIndicator";
 
 type LoginProps = NativeStackScreenProps<AuthStackParams, "Login">;
 
@@ -108,7 +103,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                 className="flex-row justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
               >
                 {isSubmitting ? (
-                  <ActivityIndicator className="mx-2" color="#fff" />
+                  <LoadingIndicator />
                 ) : (
                   <TypographyBold style={{ fontSize: 15, color: "#fff" }}>
                     Login
