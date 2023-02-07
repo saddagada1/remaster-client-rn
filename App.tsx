@@ -1,24 +1,27 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
-import AuthStackNavigator from './components/Navigators/AuthStackNavigator';
-import { useFonts } from 'expo-font';
+import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import { Provider } from "urql";
+import { useMemo } from "react";
+import { createUrqlClient } from "./utils/createUrqlClient";
+import RootStackNavigator, {
+  navigationRef,
+} from "./components/Navigators/RootStackNavigator";
+import { useAppSelector } from "./utils/hooks/reduxHooks";
 
-export default function App() {
-  const [fontsLoaded] = useFonts({
-    Inter: require('./assets/fonts/Inter-Medium.ttf'),
-    InterBold: require('./assets/fonts/Inter-Bold.ttf'),
-    Syne: require('./assets/fonts/Syne-Bold.ttf'),
-    SyneBlack: require('./assets/fonts/Syne-ExtraBold.ttf')
-  });
-  
+const App: React.FC = () => {
+  const isAuthenticated = useAppSelector((store) => store.auth.isAuthenticated);
+  const client = useMemo(() => {
+    return createUrqlClient(isAuthenticated);
+  }, [isAuthenticated]);
+
   return (
-    fontsLoaded ?
-    <NavigationContainer>
-      <StatusBar style="auto" />
-      <AuthStackNavigator/>
-    </NavigationContainer>
-    : null
+    <Provider value={client}>
+      <NavigationContainer ref={navigationRef}>
+        <StatusBar style="auto" />
+        <RootStackNavigator />
+      </NavigationContainer>
+    </Provider>
   );
-}
+};
 
-
+export default App;

@@ -13,3 +13,7 @@ export const keyColourReference: { [key: string]: string } = {
     "A#/Bb": "#8000ff",
     "B": "#ff00ff",
 };
+export const ACCESS_TOKEN_KEY = "access_token";
+export const REFRESH_TOKEN_KEY = "refresh_token";
+export const EXPIRES_IN_KEY = "expires_in";
+export const USER_KEY = "user";

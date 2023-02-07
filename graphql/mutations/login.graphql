@@ -1,0 +1,21 @@
+mutation Login($loginOptions: LoginInput!) {
+  login(loginOptions: $loginOptions) {
+    errors {
+      field
+      message
+    }
+    user {
+      _id
+      verified
+      email
+      username
+      createdAt
+      updatedAt
+    }
+    auth {
+      access_token
+      refresh_token
+      expires_in
+    }
+  }
+}

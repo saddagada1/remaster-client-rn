@@ -1,0 +1,16 @@
+mutation ChangeUsername($username: String!) {
+  changeUsername(username: $username) {
+    errors {
+      field
+      message
+    }
+    user {
+      _id
+      verified
+      email
+      username
+      createdAt
+      updatedAt
+    }
+  }
+}

@@ -8,13 +8,35 @@ import Typography from "../../Typography/Typography";
 import BackHeader from "../../Header/BackHeader";
 import Icon from "react-native-vector-icons/AntDesign";
 import Title from "../../Typography/Title";
-import { Formik } from "formik";
+import { Formik, FormikHelpers } from "formik";
 import * as yup from "yup";
 import LoadingIndicator from "../../Visualizations/LoadingIndicator";
+import { CompositeScreenProps } from "@react-navigation/native";
+import { RootStackParams } from "../../Navigators/RootStackNavigator";
+import { RegisterDocument } from "../../../generated/graphql";
+import { useMutation } from "urql";
+import { setAuthentication } from "../../../redux/slices/authSlice";
+import { setAuthKeys } from "../../../utils/secureStore";
+import { toErrorMap } from "../../../utils/toErrorMap";
+import { useAppDispatch } from "../../../utils/hooks/reduxHooks";
+import { calcExpiresIn } from "../../../utils/calcExpiresIn";
 
-type RegisterProps = NativeStackScreenProps<AuthStackParams, "Register">;
+interface RegisterValues {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+type RegisterProps = CompositeScreenProps<
+  NativeStackScreenProps<AuthStackParams, "Register">,
+  NativeStackScreenProps<RootStackParams>
+>;
 
 const Register: React.FC<RegisterProps> = ({ navigation }) => {
+  const [, register] = useMutation(RegisterDocument);
+  const dispatch = useAppDispatch();
+
   return (
     <Container>
       <BackHeader />
@@ -44,8 +66,43 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
               .string()
               .oneOf([yup.ref("password"), null], "Entries Do Not Match"),
           })}
-          onSubmit={(values) => {
-            console.log(values);
+          onSubmit={async (
+            values: RegisterValues,
+            { setErrors }: FormikHelpers<RegisterValues>
+          ) => {
+            const request = {
+              registerOptions: {
+                username: values.username,
+                email: values.email,
+                password: values.password,
+              },
+            };
+            const response = await register(request);
+            if (response.data?.register.errors) {
+              setErrors(toErrorMap(response.data.register.errors));
+            } else if (
+              response.data?.register.auth &&
+              response.data.register.user
+            ) {
+              await setAuthKeys({
+                access_token: response.data.register.auth.access_token,
+                refresh_token: response.data.register.auth.refresh_token,
+                expires_in: response.data.register.auth.expires_in,
+                user: response.data.register.user,
+              });
+              dispatch(
+                setAuthentication({
+                  isAuthenticated: true,
+                  access_token: response.data.register.auth.access_token,
+                  refresh_token: response.data.register.auth.refresh_token,
+                  expires_in: calcExpiresIn(
+                    response.data.register.auth.expires_in
+                  ),
+                  user: response.data.register.user,
+                })
+              );
+              navigation.replace("VerifyEmail");
+            }
           }}
         >
           {({
@@ -81,6 +138,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   value={values.username}
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="e.g. xs3-_-crafty"
+                  allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
@@ -103,6 +161,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   value={values.email}
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="remaster@acme.com"
+                  allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
@@ -128,6 +187,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="########"
                   secureTextEntry={true}
+                  allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
@@ -153,16 +213,18 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="########"
                   secureTextEntry={true}
+                  allowFontScaling={false}
                 />
               </View>
               <Pressable
                 onPress={() => handleSubmit()}
+                disabled={isSubmitting}
                 className="flex-row justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
               >
                 {isSubmitting ? (
-                  <LoadingIndicator />
+                  <LoadingIndicator size={15} colour="#ffffff" />
                 ) : (
-                  <TypographyBold style={{ fontSize: 15, color: "#fff" }}>
+                  <TypographyBold style={{ fontSize: 15, color: "#ffffff" }}>
                     Sign Up
                   </TypographyBold>
                 )}
@@ -172,7 +234,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
         </Formik>
         <View className="w-full flex-row justify-center">
           <Typography>Already have an account?</Typography>
-          <Pressable onPress={() => navigation.replace("Login")}>
+          <Pressable onPress={() => navigation.navigate("Login")}>
             <TypographyBold
               style={{ marginLeft: 5, textDecorationLine: "underline" }}
             >

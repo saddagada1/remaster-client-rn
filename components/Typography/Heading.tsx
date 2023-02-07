@@ -9,7 +9,11 @@ interface HeadingProps {
 
 const Heading: React.FC<HeadingProps> = ({ children, style, className }) => {
   return (
-    <Text className={className} style={[{ fontFamily: "Syne" }, style]}>
+    <Text
+      allowFontScaling={false}
+      className={className}
+      style={[{ fontFamily: "Syne" }, style]}
+    >
       {children}
     </Text>
   );

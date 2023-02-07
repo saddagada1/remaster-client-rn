@@ -13,7 +13,11 @@ const Typography: React.FC<TypographyProps> = ({
   className,
 }) => {
   return (
-    <Text className={className} style={[{ fontFamily: "Inter" }, style]}>
+    <Text
+      allowFontScaling={false}
+      className={className}
+      style={[{ fontFamily: "Inter" }, style]}
+    >
       {children}
     </Text>
   );

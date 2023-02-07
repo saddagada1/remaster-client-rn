@@ -9,7 +9,11 @@ interface TitleProps {
 
 const Title: React.FC<TitleProps> = ({ children, style, className }) => {
   return (
-    <Text className={className} style={[{ fontFamily: "SyneBlack" }, style]}>
+    <Text
+      allowFontScaling={false}
+      className={className}
+      style={[{ fontFamily: "SyneBlack" }, style]}
+    >
       {children}
     </Text>
   );

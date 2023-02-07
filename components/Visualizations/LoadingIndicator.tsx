@@ -9,7 +9,15 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 
-const LoadingIndicator: React.FC = () => {
+interface LoadingIndicatorProps {
+  size: number;
+  colour: string;
+}
+
+const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
+  size,
+  colour,
+}) => {
   const barScale = Array(10)
     .fill(null)
     .map((_) => {
@@ -40,6 +48,7 @@ const LoadingIndicator: React.FC = () => {
       }
     };
   }, []);
+
   return (
     <View className="w-full flex-row justify-center items-center">
       {Array(10)
@@ -50,8 +59,8 @@ const LoadingIndicator: React.FC = () => {
             style={[
               {
                 fontFamily: "InterBold",
-                fontSize: 15,
-                color: "#fff",
+                fontSize: size,
+                color: colour,
               },
               barAnimStyles[index],
             ]}

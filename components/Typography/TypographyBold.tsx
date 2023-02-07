@@ -13,7 +13,11 @@ const TypographyBold: React.FC<TypographyBoldProps> = ({
   className,
 }) => {
   return (
-    <Text className={className} style={[{ fontFamily: "InterBold" }, style]}>
+    <Text
+      allowFontScaling={false}
+      className={className}
+      style={[{ fontFamily: "InterBold" }, style]}
+    >
       {children}
     </Text>
   );

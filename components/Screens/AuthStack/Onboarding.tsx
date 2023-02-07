@@ -17,11 +17,18 @@ import Animated, {
 } from "react-native-reanimated";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParams } from "../../Navigators/AuthStackNavigator";
-import { useIsFocused } from "@react-navigation/native";
+import { CompositeScreenProps, useIsFocused } from "@react-navigation/native";
+import { RootStackParams } from "../../Navigators/RootStackNavigator";
+import * as Google from "expo-auth-session/providers/google";
+import { GOOGLE_OAUTH_CLIENT_ID } from "@env";
 
-type OnboardingProps = NativeStackScreenProps<AuthStackParams, "Onboarding">;
+type OnboardingProps = CompositeScreenProps<
+  NativeStackScreenProps<AuthStackParams, "Onboarding">,
+  NativeStackScreenProps<RootStackParams>
+>;
 
 const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
+  // animations
   const isFocused = useIsFocused();
   const [portalWidth, setPortalWidth] = useState(0);
   const [portalHeight, setPortalHeight] = useState(0);
@@ -89,6 +96,22 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
     );
   }, []);
 
+  //oauth
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: GOOGLE_OAUTH_CLIENT_ID,
+    selectAccount: true,
+  });
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const access_token = response.authentication?.accessToken;
+      navigation.navigate("RegisterWithGoogle", {
+        access_token: access_token!,
+      });
+    }
+  }, [response]);
+
   return (
     <Container>
       <Animated.View className="my-10" style={uiRevealTopAnimStyles}>
@@ -134,16 +157,22 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
       >
         <Pressable
           className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black"
-          onPress={() => navigation.push("Register")}
+          onPress={() => navigation.navigate("Register")}
         >
-          <Icon name="envelope" size={20} color="#fff" />
+          <Icon name="envelope" size={20} color="#ffffff" />
           <TypographyBold
-            style={{ fontSize: 15, color: "#fff", marginLeft: 15 }}
+            style={{ fontSize: 15, color: "#ffffff", marginLeft: 15 }}
           >
             Sign Up with Email
           </TypographyBold>
         </Pressable>
-        <Pressable className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-stone-300 border-2 border-black">
+        <Pressable
+          className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-stone-300 border-2 border-black"
+          disabled={!request}
+          onPress={() => {
+            promptAsync();
+          }}
+        >
           <Icon name="google" size={20} />
           <TypographyBold style={{ fontSize: 15, marginLeft: 15 }}>
             Sign Up with Google
@@ -151,7 +180,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
         </Pressable>
         <View className="flex-row mb-3">
           <Typography>Already have an account?</Typography>
-          <Pressable onPress={() => navigation.push("Login")}>
+          <Pressable onPress={() => navigation.navigate("Login")}>
             <TypographyBold
               style={{ marginLeft: 5, textDecorationLine: "underline" }}
             >
@@ -161,7 +190,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
         </View>
         <View className="flex-row">
           <Typography>Explore with</Typography>
-          <Pressable onPress={() => console.log("guest")}>
+          <Pressable
+            onPress={() => navigation.navigate("Main", { screen: "Home" })}
+          >
             <TypographyBold
               style={{ marginLeft: 5, textDecorationLine: "underline" }}
             >
