@@ -77,7 +77,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             user: response.data.loginWithGoogle.user,
           })
         );
-        navigation.replace("Main", { screen: "Home" });
+        navigation.replace("Main", {
+          screen: "CoreTabs",
+          params: { screen: "Home" },
+        });
       }
     };
 
@@ -125,7 +128,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                   user: response.data.login.user,
                 })
               );
-              navigation.replace("Main", { screen: "Home" });
+              navigation.replace("Main", {
+                screen: "CoreTabs",
+                params: { screen: "Home" },
+              });
             }
           }}
         >

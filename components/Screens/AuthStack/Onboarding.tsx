@@ -191,7 +191,12 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
         <View className="flex-row">
           <Typography>Explore with</Typography>
           <Pressable
-            onPress={() => navigation.navigate("Main", { screen: "Home" })}
+            onPress={() =>
+              navigation.replace("Main", {
+                screen: "CoreTabs",
+                params: { screen: "Home" },
+              })
+            }
           >
             <TypographyBold
               style={{ marginLeft: 5, textDecorationLine: "underline" }}

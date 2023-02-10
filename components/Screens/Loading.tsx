@@ -20,7 +20,7 @@ const Loading: React.FC<LoadingProps> = ({ navigation }) => {
   console.log("loading");
   useEffect(() => {
     const checkAuthentication = async () => {
-      await sleep(5000);
+      await sleep(1000);
       const values = await getAuthKeys();
       if (!values) {
         dispatch(
@@ -43,7 +43,10 @@ const Loading: React.FC<LoadingProps> = ({ navigation }) => {
             user: values.user,
           })
         );
-        navigation.replace("Main", { screen: "Home" });
+        navigation.replace("Main", {
+          screen: "CoreTabs",
+          params: { screen: "Home" },
+        });
       }
     };
 

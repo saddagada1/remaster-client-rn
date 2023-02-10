@@ -16,6 +16,17 @@ import {
 import { store } from "../redux/store";
 import { calcExpiresIn } from "./calcExpiresIn";
 import { delAuthKeys, setAuthKeys } from "./secureStore";
+import axiosRetry from "axios-retry";
+
+axiosRetry(axios, {
+  retries: 3,
+  // retryCondition: (error) => {
+  //   return true;
+  // },
+  onRetry: (retryCount) => {
+    console.log("retry: ", retryCount);
+  },
+});
 
 interface UrqlAuthState {
   access_token: string;
@@ -43,13 +54,13 @@ const getAuth: AuthConfig<UrqlAuthState>["getAuth"] = async ({ authState }) => {
   }
 
   console.log("refreshing token");
-  const response = await axios.post(
-    REFRESH_TOKEN_ENDPOINT,
-    {},
-    { headers: { Authorization: `Bearer ${authState.access_token}` } }
-  );
+  try {
+    const response = await axios.post(
+      REFRESH_TOKEN_ENDPOINT,
+      {},
+      { headers: { Authorization: `Bearer ${authState.refresh_token}` } }
+    );
 
-  if (response.data?.ok) {
     console.log("refreshed token");
     await setAuthKeys({
       access_token: response.data.access_token,
@@ -71,21 +82,21 @@ const getAuth: AuthConfig<UrqlAuthState>["getAuth"] = async ({ authState }) => {
       refresh_token: response.data.refresh_token,
       expires_in: calcExpiresIn(response.data.expires_in),
     };
+  } catch (err: any) {
+    console.log("forced log out: ", err.code);
+    await delAuthKeys();
+    store.dispatch(
+      setAuthentication({
+        isAuthenticated: false,
+        access_token: null,
+        refresh_token: null,
+        expires_in: null,
+        user: null,
+      })
+    );
+    AuthNavigator("Auth", { screen: "Onboarding" }, "replace");
+    return null;
   }
-
-  console.log("forced log out");
-  await delAuthKeys();
-  store.dispatch(
-    setAuthentication({
-      isAuthenticated: false,
-      access_token: null,
-      refresh_token: null,
-      expires_in: null,
-      user: null,
-    })
-  );
-  AuthNavigator("Auth", { screen: "Onboarding" }, "replace");
-  return null;
 };
 
 const addAuthToOperation: AuthConfig<UrqlAuthState>["addAuthToOperation"] = ({

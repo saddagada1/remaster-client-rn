@@ -23,8 +23,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             placeholderTextColor="#000"
           />
         </View>
-        <Pressable className="border-2 border-black rounded-lg p-2 justify-center items-center">
-          <Icon name="pluscircle" size={25} />
+        <Pressable className="border-2 border-black rounded-lg py-2 px-3 justify-center items-center">
+          <Icon name="bells" size={25} />
         </Pressable>
       </View>
     </View>

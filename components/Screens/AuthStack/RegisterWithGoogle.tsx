@@ -89,7 +89,10 @@ const RegisterWithGoogle: React.FC<RegisterWithGoogleProps> = ({
                   user: response.data.registerWithGoogle.user,
                 })
               );
-              navigation.replace("Main", { screen: "Home" });
+              navigation.replace("Main", {
+                screen: "CoreTabs",
+                params: { screen: "Home" },
+              });
             }
           }}
         >

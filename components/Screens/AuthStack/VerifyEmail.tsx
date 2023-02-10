@@ -58,7 +58,10 @@ const VerifyEmail: React.FC<VerifyEmailProps> = ({ navigation }) => {
             } else if (response.data?.verifyEmail.user) {
               await setUserKey(response.data.verifyEmail.user);
               dispatch(setUser({ user: response.data.verifyEmail.user }));
-              navigation.replace("Main", { screen: "Home" });
+              navigation.replace("Main", {
+                screen: "CoreTabs",
+                params: { screen: "Home" },
+              });
             }
           }}
         >
@@ -117,7 +120,12 @@ const VerifyEmail: React.FC<VerifyEmailProps> = ({ navigation }) => {
         <View className="w-full flex-row justify-center">
           <Typography>Too Lazy?</Typography>
           <Pressable
-            onPress={() => navigation.replace("Main", { screen: "Home" })}
+            onPress={() =>
+              navigation.replace("Main", {
+                screen: "CoreTabs",
+                params: { screen: "Home" },
+              })
+            }
           >
             <TypographyBold
               style={{ marginLeft: 5, textDecorationLine: "underline" }}

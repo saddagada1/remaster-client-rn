@@ -24,6 +24,7 @@ const documents = {
     "mutation RegisterWithGoogle($registerWithGoogleOptions: RegisterWithGoogleInput!) {\n  registerWithGoogle(registerWithGoogleOptions: $registerWithGoogleOptions) {\n    errors {\n      field\n      message\n    }\n    user {\n      _id\n      verified\n      email\n      username\n      createdAt\n      updatedAt\n    }\n    auth {\n      access_token\n      refresh_token\n      expires_in\n    }\n  }\n}": types.RegisterWithGoogleDocument,
     "mutation SendVerifyEmail {\n  sendVerifyEmail\n}": types.SendVerifyEmailDocument,
     "mutation VerifyEmail($token: String!) {\n  verifyEmail(token: $token) {\n    errors {\n      field\n      message\n    }\n    user {\n      _id\n      verified\n      email\n      username\n      createdAt\n      updatedAt\n    }\n  }\n}": types.VerifyEmailDocument,
+    "query Users {\n  users {\n    _id\n    verified\n    email\n    username\n    createdAt\n    updatedAt\n  }\n}": types.UsersDocument,
 };
 
 /**
@@ -84,6 +85,10 @@ export function graphql(source: "mutation SendVerifyEmail {\n  sendVerifyEmail\n
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation VerifyEmail($token: String!) {\n  verifyEmail(token: $token) {\n    errors {\n      field\n      message\n    }\n    user {\n      _id\n      verified\n      email\n      username\n      createdAt\n      updatedAt\n    }\n  }\n}"): (typeof documents)["mutation VerifyEmail($token: String!) {\n  verifyEmail(token: $token) {\n    errors {\n      field\n      message\n    }\n    user {\n      _id\n      verified\n      email\n      username\n      createdAt\n      updatedAt\n    }\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query Users {\n  users {\n    _id\n    verified\n    email\n    username\n    createdAt\n    updatedAt\n  }\n}"): (typeof documents)["query Users {\n  users {\n    _id\n    verified\n    email\n    username\n    createdAt\n    updatedAt\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

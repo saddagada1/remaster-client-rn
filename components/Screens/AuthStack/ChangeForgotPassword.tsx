@@ -113,7 +113,10 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
                   user: response.data.changeForgotPassword.user,
                 })
               );
-              navigation.replace("Main", { screen: "Home" });
+              navigation.replace("Main", {
+                screen: "CoreTabs",
+                params: { screen: "Home" },
+              });
             }
           }}
         >

@@ -64,6 +64,7 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
               },
               barAnimStyles[index],
             ]}
+            allowFontScaling={false}
           >
             |
           </Animated.Text>
