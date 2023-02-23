@@ -1,6 +1,6 @@
 import { registerRootComponent } from "expo";
 import { useFonts } from "expo-font";
-import { Provider } from "react-redux";
+import { Provider as ReduxProvider } from "react-redux";
 import App from "./App";
 import { store } from "./redux/store";
 
@@ -13,9 +13,9 @@ const Index: React.FC = () => {
   });
 
   return fontsLoaded ? (
-    <Provider store={store}>
+    <ReduxProvider store={store}>
       <App />
-    </Provider>
+    </ReduxProvider>
   ) : null;
 };
 

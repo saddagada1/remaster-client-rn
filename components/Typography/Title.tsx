@@ -1,19 +1,14 @@
-import { StyleProp, Text, TextStyle } from "react-native";
+import { StyleProp, Text, TextProps, TextStyle } from "react-native";
 import React from "react";
 
-interface TitleProps {
+interface TitleProps extends TextProps {
   children: React.ReactNode;
   style?: StyleProp<TextStyle>;
-  className?: string;
 }
 
-const Title: React.FC<TitleProps> = ({ children, style, className }) => {
+const Title: React.FC<TitleProps> = ({ children, style, ...TextProps }) => {
   return (
-    <Text
-      allowFontScaling={false}
-      className={className}
-      style={[{ fontFamily: "SyneBlack" }, style]}
-    >
+    <Text allowFontScaling={false} {...TextProps} style={[{ fontFamily: "SyneBlack" }, style]}>
       {children}
     </Text>
   );

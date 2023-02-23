@@ -1,23 +1,14 @@
-import { StyleProp, Text, TextStyle } from "react-native";
+import { StyleProp, Text, TextProps, TextStyle } from "react-native";
 import React from "react";
 
-interface TypographyProps {
+interface TypographyProps extends TextProps {
   children: React.ReactNode;
   style?: StyleProp<TextStyle>;
-  className?: string;
 }
 
-const Typography: React.FC<TypographyProps> = ({
-  children,
-  style,
-  className,
-}) => {
+const Typography: React.FC<TypographyProps> = ({ children, style, ...TextProps }) => {
   return (
-    <Text
-      allowFontScaling={false}
-      className={className}
-      style={[{ fontFamily: "Inter" }, style]}
-    >
+    <Text allowFontScaling={false} {...TextProps} style={[{ fontFamily: "Inter" }, style]}>
       {children}
     </Text>
   );

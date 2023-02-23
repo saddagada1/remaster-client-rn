@@ -6,7 +6,7 @@ import Container from "../../Container/Container";
 import TypographyBold from "../../Typography/TypographyBold";
 import Typography from "../../Typography/Typography";
 import BackHeader from "../../Header/BackHeader";
-import Icon from "react-native-vector-icons/AntDesign";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import Title from "../../Typography/Title";
 import { Formik, FormikHelpers } from "formik";
 import * as yup from "yup";
@@ -19,7 +19,7 @@ import { setAuthentication } from "../../../redux/slices/authSlice";
 import { setAuthKeys } from "../../../utils/secureStore";
 import { toErrorMap } from "../../../utils/toErrorMap";
 import { useAppDispatch } from "../../../utils/hooks/reduxHooks";
-import { calcExpiresIn } from "../../../utils/calcExpiresIn";
+import { calcExpiresIn } from "../../../utils/calc";
 
 interface ChangeForgotPasswordValues {
   email: string;
@@ -33,10 +33,7 @@ type ChangeForgotPasswordProps = CompositeScreenProps<
   NativeStackScreenProps<RootStackParams>
 >;
 
-const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
-  navigation,
-  route,
-}) => {
+const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({ navigation, route }) => {
   const { email } = route.params;
   const [, changeForgotPassword] = useMutation(ChangeForgotPasswordDocument);
   const dispatch = useAppDispatch();
@@ -46,13 +43,9 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
       <BackHeader />
       <View className="w-[90%] flex-1 my-10 justify-center">
         <TypographyBold>Problem Solved!</TypographyBold>
-        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>
-          forgot password
-        </Title>
+        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>forgot password</Title>
         <View className="bg-green-300 rounded-xl items-center justify-center mt-5 p-2">
-          <TypographyBold style={{ fontSize: 15 }}>
-            Success! We sent you a Token.
-          </TypographyBold>
+          <TypographyBold style={{ fontSize: 15 }}>Success! We sent you a Token.</TypographyBold>
         </View>
         <Formik
           initialValues={{
@@ -62,14 +55,8 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
             confirmPassword: "",
           }}
           validationSchema={yup.object().shape({
-            token: yup
-              .string()
-              .min(6, "Token Must be 6 Chars")
-              .required("Required"),
-            password: yup
-              .string()
-              .min(8, "Min 8 Chars Required")
-              .required("Required"),
+            token: yup.string().min(6, "Token Must be 6 Chars").required("Required"),
+            password: yup.string().min(8, "Min 8 Chars Required").required("Required"),
             confirmPassword: yup
               .string()
               .oneOf([yup.ref("password"), null], "Entries Do Not Match"),
@@ -90,27 +77,33 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
               setErrors(toErrorMap(response.data.changeForgotPassword.errors));
             } else if (
               response.data?.changeForgotPassword.auth &&
-              response.data.changeForgotPassword.user
+              response.data?.changeForgotPassword.user
             ) {
               await setAuthKeys({
-                access_token:
-                  response.data.changeForgotPassword.auth.access_token,
-                refresh_token:
-                  response.data.changeForgotPassword.auth.refresh_token,
+                access_token: response.data.changeForgotPassword.auth.access_token,
+                refresh_token: response.data.changeForgotPassword.auth.refresh_token,
                 expires_in: response.data.changeForgotPassword.auth.expires_in,
                 user: response.data.changeForgotPassword.user,
+                spotify_access_token:
+                  response.data.changeForgotPassword.spotify_auth?.spotify_access_token,
+                spotify_expires_in:
+                  response.data.changeForgotPassword.spotify_auth?.spotify_expires_in,
               });
               dispatch(
                 setAuthentication({
                   isAuthenticated: true,
-                  access_token:
-                    response.data.changeForgotPassword.auth.access_token,
-                  refresh_token:
-                    response.data.changeForgotPassword.auth.refresh_token,
-                  expires_in: calcExpiresIn(
-                    response.data.changeForgotPassword.auth.expires_in
-                  ),
+                  access_token: response.data.changeForgotPassword.auth.access_token,
+                  refresh_token: response.data.changeForgotPassword.auth.refresh_token,
+                  expires_in: calcExpiresIn(response.data.changeForgotPassword.auth.expires_in),
                   user: response.data.changeForgotPassword.user,
+                  spotify_access_token:
+                    response.data.changeForgotPassword.spotify_auth?.spotify_access_token,
+                  spotify_expires_in: response.data.changeForgotPassword.spotify_auth
+                    ?.spotify_expires_in
+                    ? calcExpiresIn(
+                        response.data.changeForgotPassword.spotify_auth.spotify_expires_in
+                      )
+                    : null,
                 })
               );
               navigation.replace("Main", {
@@ -134,13 +127,11 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
               <View className="flex-row items-center justify-between mb-2 px-1">
                 <TypographyBold style={{ fontSize: 15 }}>Token</TypographyBold>
                 {touched.token && errors.token && (
-                  <Typography className="text-red-800">
-                    {errors.token}
-                  </Typography>
+                  <Typography className="text-red-800">{errors.token}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-5">
-                <Icon name="key" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-5">
+                <AntDesign name="key" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("token")}
@@ -153,21 +144,18 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
                   placeholder="######"
                   keyboardType="numeric"
                   maxLength={6}
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
-                <TypographyBold style={{ fontSize: 15 }}>
-                  Password
-                </TypographyBold>
+                <TypographyBold style={{ fontSize: 15 }}>Password</TypographyBold>
                 {touched.password && errors.password && (
-                  <Typography className="text-red-800">
-                    {errors.password}
-                  </Typography>
+                  <Typography className="text-red-800">{errors.password}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-5">
-                <Icon name="key" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-5">
+                <AntDesign name="key" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("password")}
@@ -179,21 +167,18 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="########"
                   secureTextEntry={true}
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
-                <TypographyBold style={{ fontSize: 15 }}>
-                  Confirm Password
-                </TypographyBold>
-                {errors.confirmPassword && (
-                  <Typography className="text-red-800">
-                    {errors.confirmPassword}
-                  </Typography>
+                <TypographyBold style={{ fontSize: 15 }}>Confirm Password</TypographyBold>
+                {errors.confirmPassword && touched.confirmPassword && (
+                  <Typography className="text-red-800">{errors.confirmPassword}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-12">
-                <Icon name="key" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-12">
+                <AntDesign name="key" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("confirmPassword")}
@@ -205,6 +190,7 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="########"
                   secureTextEntry={true}
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>
@@ -216,9 +202,7 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
                 {isSubmitting ? (
                   <LoadingIndicator size={15} colour="#ffffff" />
                 ) : (
-                  <TypographyBold style={{ fontSize: 15, color: "#ffffff" }}>
-                    Update
-                  </TypographyBold>
+                  <TypographyBold style={{ fontSize: 15, color: "#ffffff" }}>Update</TypographyBold>
                 )}
               </Pressable>
             </View>
@@ -227,9 +211,7 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({
         <View className="w-full flex-row justify-center">
           <Typography>No Email or Token Expired?</Typography>
           <Pressable onPress={() => navigation.replace("ForgotPassword")}>
-            <TypographyBold
-              style={{ marginLeft: 5, textDecorationLine: "underline" }}
-            >
+            <TypographyBold style={{ marginLeft: 5, textDecorationLine: "underline" }}>
               Retry
             </TypographyBold>
           </Pressable>

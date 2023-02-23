@@ -1,23 +1,14 @@
-import { StyleProp, Text, TextStyle } from "react-native";
+import { StyleProp, Text, TextProps, TextStyle } from "react-native";
 import React from "react";
 
-interface TypographyBoldProps {
+interface TypographyBoldProps extends TextProps {
   children: React.ReactNode;
   style?: StyleProp<TextStyle>;
-  className?: string;
 }
 
-const TypographyBold: React.FC<TypographyBoldProps> = ({
-  children,
-  style,
-  className,
-}) => {
+const TypographyBold: React.FC<TypographyBoldProps> = ({ children, style, ...TextProps }) => {
   return (
-    <Text
-      allowFontScaling={false}
-      className={className}
-      style={[{ fontFamily: "InterBold" }, style]}
-    >
+    <Text allowFontScaling={false} {...TextProps} style={[{ fontFamily: "InterBold" }, style]}>
       {children}
     </Text>
   );

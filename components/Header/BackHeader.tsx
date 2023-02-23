@@ -1,6 +1,6 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
 import React from "react";
-import Icon from "react-native-vector-icons/AntDesign";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import TypographyBold from "../Typography/TypographyBold";
 import { useNavigation } from "@react-navigation/native";
 
@@ -16,7 +16,7 @@ const BackHeader: React.FC<BackHeaderProps> = ({ title }) => {
         onPress={() => navigation.goBack()}
         className="border-2 border-black rounded-2xl p-2 justify-center items-center"
       >
-        <Icon name="arrowleft" size={25} />
+        <AntDesign name="arrowleft" size={25} />
       </Pressable>
       <TypographyBold className="flex-1">{title}</TypographyBold>
     </View>

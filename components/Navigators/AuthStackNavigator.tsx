@@ -11,7 +11,7 @@ export type AuthStackParams = {
   Onboarding: undefined;
   Register: undefined;
   VerifyEmail: undefined;
-  RegisterWithGoogle: { access_token: string };
+  RegisterWithGoogle: { id_token: string };
   Login: undefined;
   ForgotPassword: undefined;
   ChangeForgotPassword: { email: string };

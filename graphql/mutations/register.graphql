@@ -17,5 +17,9 @@ mutation Register($registerOptions: RegisterInput!) {
       refresh_token
       expires_in
     }
+    spotify_auth {
+      spotify_access_token
+      spotify_expires_in
+    }
   }
 }

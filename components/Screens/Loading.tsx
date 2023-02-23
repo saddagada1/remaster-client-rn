@@ -5,7 +5,10 @@ import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "../Navigators/RootStackNavigator";
 import { useAppDispatch } from "../../utils/hooks/reduxHooks";
-import { setAuthentication } from "../../redux/slices/authSlice";
+import {
+  resetAuthentication,
+  setAuthentication,
+} from "../../redux/slices/authSlice";
 import { getAuthKeys } from "../../utils/secureStore";
 import { sleep } from "../../utils/sleep";
 
@@ -23,15 +26,7 @@ const Loading: React.FC<LoadingProps> = ({ navigation }) => {
       await sleep(1000);
       const values = await getAuthKeys();
       if (!values) {
-        dispatch(
-          setAuthentication({
-            isAuthenticated: false,
-            access_token: null,
-            refresh_token: null,
-            expires_in: null,
-            user: null,
-          })
-        );
+        dispatch(resetAuthentication());
         navigation.replace("Auth", { screen: "Onboarding" });
       } else {
         dispatch(
@@ -41,6 +36,8 @@ const Loading: React.FC<LoadingProps> = ({ navigation }) => {
             refresh_token: values.refresh_token,
             expires_in: values.expires_in,
             user: values.user,
+            spotify_access_token: values.spotify_access_token,
+            spotify_expires_in: values.spotify_expires_in,
           })
         );
         navigation.replace("Main", {

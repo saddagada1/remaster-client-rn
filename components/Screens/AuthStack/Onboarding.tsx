@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Container from "../../Container/Container";
 import Title from "../../Typography/Title";
 import TypographyBold from "../../Typography/TypographyBold";
-import Icon from "react-native-vector-icons/FontAwesome";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import Portal from "../../Visualizations/Portal";
 import { keyColourReference } from "../../../utils/constants";
 import Typography from "../../Typography/Typography";
@@ -21,6 +21,12 @@ import { CompositeScreenProps, useIsFocused } from "@react-navigation/native";
 import { RootStackParams } from "../../Navigators/RootStackNavigator";
 import * as Google from "expo-auth-session/providers/google";
 import { GOOGLE_OAUTH_CLIENT_ID } from "@env";
+import { useMutation } from "urql";
+import { LoginWithGuestAccessDocument } from "../../../generated/graphql";
+import { useAppDispatch } from "../../../utils/hooks/reduxHooks";
+import { setSpotifyKeys } from "../../../utils/secureStore";
+import { setSpotifyAuthentication } from "../../../redux/slices/authSlice";
+import { calcExpiresIn } from "../../../utils/calc";
 
 type OnboardingProps = CompositeScreenProps<
   NativeStackScreenProps<AuthStackParams, "Onboarding">,
@@ -101,24 +107,27 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: GOOGLE_OAUTH_CLIENT_ID,
     selectAccount: true,
+    responseType: "id_token",
   });
 
   useEffect(() => {
     if (response?.type === "success") {
-      const access_token = response.authentication?.accessToken;
+      const id_token = response.params.id_token;
       navigation.navigate("RegisterWithGoogle", {
-        access_token: access_token!,
+        id_token: id_token,
       });
     }
   }, [response]);
+
+  //guest access
+  const [, loginWithGuestAccess] = useMutation(LoginWithGuestAccessDocument);
+  const dispatch = useAppDispatch();
 
   return (
     <Container>
       <Animated.View className="my-10" style={uiRevealTopAnimStyles}>
         <TypographyBold>Welcome To</TypographyBold>
-        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>
-          remaster
-        </Title>
+        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>remaster</Title>
       </Animated.View>
       <View className="w-full flex-1 flex-row justify-center mb-2">
         <View
@@ -128,10 +137,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
             setPortalHeight(event.nativeEvent.layout.height);
           }}
         >
-          <Animated.View
-            className="w-full h-full"
-            style={portalRevealAnimStyles}
-          >
+          <Animated.View className="w-full h-full" style={portalRevealAnimStyles}>
             {portalWidth && portalHeight ? (
               <Portal
                 width={portalWidth}
@@ -142,27 +148,19 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
             ) : null}
           </Animated.View>
         </View>
-        <Animated.View
-          className="w-[30%] h-full bg-stone-400"
-          style={portalRevealLeftAnimStyles}
-        />
+        <Animated.View className="w-[30%] h-full bg-stone-400" style={portalRevealLeftAnimStyles} />
         <Animated.View
           className="w-[30%] h-full bg-stone-400"
           style={portalRevealRightAnimStyles}
         />
       </View>
-      <Animated.View
-        className="w-full items-center my-10"
-        style={uiRevealBottomAnimStyles}
-      >
+      <Animated.View className="w-full items-center my-10" style={uiRevealBottomAnimStyles}>
         <Pressable
           className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black"
           onPress={() => navigation.navigate("Register")}
         >
-          <Icon name="envelope" size={20} color="#ffffff" />
-          <TypographyBold
-            style={{ fontSize: 15, color: "#ffffff", marginLeft: 15 }}
-          >
+          <AntDesign name="mail" size={20} color="#ffffff" />
+          <TypographyBold style={{ fontSize: 15, color: "#ffffff", marginLeft: 15 }}>
             Sign Up with Email
           </TypographyBold>
         </Pressable>
@@ -173,7 +171,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
             promptAsync();
           }}
         >
-          <Icon name="google" size={20} />
+          <AntDesign name="google" size={20} />
           <TypographyBold style={{ fontSize: 15, marginLeft: 15 }}>
             Sign Up with Google
           </TypographyBold>
@@ -181,9 +179,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
         <View className="flex-row mb-3">
           <Typography>Already have an account?</Typography>
           <Pressable onPress={() => navigation.navigate("Login")}>
-            <TypographyBold
-              style={{ marginLeft: 5, textDecorationLine: "underline" }}
-            >
+            <TypographyBold style={{ marginLeft: 5, textDecorationLine: "underline" }}>
               Login
             </TypographyBold>
           </Pressable>
@@ -191,16 +187,27 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
         <View className="flex-row">
           <Typography>Explore with</Typography>
           <Pressable
-            onPress={() =>
-              navigation.replace("Main", {
+            onPress={async () => {
+              const response = await loginWithGuestAccess({});
+              await setSpotifyKeys({
+                spotify_access_token: response.data?.loginWithGuestAccess.spotify_access_token,
+                spotify_expires_in: response.data?.loginWithGuestAccess.spotify_expires_in,
+              });
+              dispatch(
+                setSpotifyAuthentication({
+                  spotify_access_token: response.data?.loginWithGuestAccess.spotify_access_token,
+                  spotify_expires_in: response.data?.loginWithGuestAccess.spotify_expires_in
+                    ? calcExpiresIn(response.data.loginWithGuestAccess.spotify_expires_in)
+                    : null,
+                })
+              );
+              navigation.navigate("Main", {
                 screen: "CoreTabs",
                 params: { screen: "Home" },
-              })
-            }
+              });
+            }}
           >
-            <TypographyBold
-              style={{ marginLeft: 5, textDecorationLine: "underline" }}
-            >
+            <TypographyBold style={{ marginLeft: 5, textDecorationLine: "underline" }}>
               Guest Access
             </TypographyBold>
           </Pressable>

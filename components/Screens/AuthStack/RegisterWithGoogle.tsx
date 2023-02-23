@@ -6,7 +6,7 @@ import Container from "../../Container/Container";
 import TypographyBold from "../../Typography/TypographyBold";
 import Typography from "../../Typography/Typography";
 import BackHeader from "../../Header/BackHeader";
-import Icon from "react-native-vector-icons/AntDesign";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import Title from "../../Typography/Title";
 import { Formik, FormikHelpers } from "formik";
 import * as yup from "yup";
@@ -16,13 +16,13 @@ import { RootStackParams } from "../../Navigators/RootStackNavigator";
 import { useMutation } from "urql";
 import { RegisterWithGoogleDocument } from "../../../generated/graphql";
 import { setAuthentication } from "../../../redux/slices/authSlice";
-import { calcExpiresIn } from "../../../utils/calcExpiresIn";
+import { calcExpiresIn } from "../../../utils/calc";
 import { useAppDispatch } from "../../../utils/hooks/reduxHooks";
 import { setAuthKeys } from "../../../utils/secureStore";
 import { toErrorMap } from "../../../utils/toErrorMap";
+import { toBase64String } from "../../../utils/toBase64String";
 
 interface RegisterWithGoogleValues {
-  access_token: string;
   username: string;
 }
 
@@ -31,11 +31,8 @@ type RegisterWithGoogleProps = CompositeScreenProps<
   NativeStackScreenProps<RootStackParams>
 >;
 
-const RegisterWithGoogle: React.FC<RegisterWithGoogleProps> = ({
-  navigation,
-  route,
-}) => {
-  const { access_token } = route.params;
+const RegisterWithGoogle: React.FC<RegisterWithGoogleProps> = ({ navigation, route }) => {
+  const { id_token } = route.params;
   const [, registerWithGoogle] = useMutation(RegisterWithGoogleDocument);
   const dispatch = useAppDispatch();
 
@@ -44,23 +41,23 @@ const RegisterWithGoogle: React.FC<RegisterWithGoogleProps> = ({
       <BackHeader />
       <View className="w-[90%] flex-1 my-10 justify-center">
         <TypographyBold>Almost There!</TypographyBold>
-        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>
-          sign up
-        </Title>
+        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>sign up</Title>
         <Formik
-          initialValues={{ access_token: access_token, username: "" }}
+          initialValues={{ username: "" }}
           validationSchema={yup.object().shape({
-            username: yup
-              .string()
-              .min(5, "Min 5 Chars Required")
-              .required("Required"),
+            username: yup.string().min(5, "Min 5 Chars Required").required("Required"),
           })}
           onSubmit={async (
             values: RegisterWithGoogleValues,
             { setErrors }: FormikHelpers<RegisterWithGoogleValues>
           ) => {
-            const response = await registerWithGoogle({
-              registerWithGoogleOptions: values,
+            const base64IdToken = toBase64String(id_token);
+            const response = await registerWithGoogle(values, {
+              fetchOptions: {
+                headers: {
+                  Authorization: `Bearer ${base64IdToken}`,
+                },
+              },
             });
             if (response.data?.registerWithGoogle.errors) {
               setErrors(toErrorMap(response.data.registerWithGoogle.errors));
@@ -69,24 +66,30 @@ const RegisterWithGoogle: React.FC<RegisterWithGoogleProps> = ({
               response.data.registerWithGoogle.user
             ) {
               await setAuthKeys({
-                access_token:
-                  response.data.registerWithGoogle.auth.access_token,
-                refresh_token:
-                  response.data.registerWithGoogle.auth.refresh_token,
+                access_token: response.data.registerWithGoogle.auth.access_token,
+                refresh_token: response.data.registerWithGoogle.auth.refresh_token,
                 expires_in: response.data.registerWithGoogle.auth.expires_in,
                 user: response.data.registerWithGoogle.user,
+                spotify_access_token:
+                  response.data.registerWithGoogle.spotify_auth?.spotify_access_token,
+                spotify_expires_in:
+                  response.data.registerWithGoogle.spotify_auth?.spotify_expires_in,
               });
               dispatch(
                 setAuthentication({
                   isAuthenticated: true,
-                  access_token:
-                    response.data.registerWithGoogle.auth.access_token,
-                  refresh_token:
-                    response.data.registerWithGoogle.auth.refresh_token,
-                  expires_in: calcExpiresIn(
-                    response.data.registerWithGoogle.auth.expires_in
-                  ),
+                  access_token: response.data.registerWithGoogle.auth.access_token,
+                  refresh_token: response.data.registerWithGoogle.auth.refresh_token,
+                  expires_in: calcExpiresIn(response.data.registerWithGoogle.auth.expires_in),
                   user: response.data.registerWithGoogle.user,
+                  spotify_access_token:
+                    response.data.registerWithGoogle.spotify_auth?.spotify_access_token,
+                  spotify_expires_in: response.data.registerWithGoogle.spotify_auth
+                    ?.spotify_expires_in
+                    ? calcExpiresIn(
+                        response.data.registerWithGoogle.spotify_auth.spotify_expires_in
+                      )
+                    : null,
                 })
               );
               navigation.replace("Main", {
@@ -108,17 +111,13 @@ const RegisterWithGoogle: React.FC<RegisterWithGoogleProps> = ({
           }) => (
             <View className="w-full my-10">
               <View className="flex-row items-center justify-between mb-2 px-1">
-                <TypographyBold style={{ fontSize: 15 }}>
-                  Username
-                </TypographyBold>
+                <TypographyBold style={{ fontSize: 15 }}>Username</TypographyBold>
                 {touched.username && errors.username && (
-                  <Typography className="text-red-800">
-                    {errors.username}
-                  </Typography>
+                  <Typography className="text-red-800">{errors.username}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-12">
-                <Icon name="meh" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-12">
+                <AntDesign name="meh" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("username")}
@@ -129,6 +128,7 @@ const RegisterWithGoogle: React.FC<RegisterWithGoogleProps> = ({
                   value={values.username}
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="e.g. xs3-_-crafty"
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>

@@ -1,5 +1,5 @@
-mutation LoginWithGoogle($accessToken: String!) {
-  loginWithGoogle(accessToken: $accessToken) {
+mutation LoginWithGoogle {
+  loginWithGoogle {
     errors {
       field
       message
@@ -16,6 +16,10 @@ mutation LoginWithGoogle($accessToken: String!) {
       access_token
       refresh_token
       expires_in
+    }
+    spotify_auth {
+      spotify_access_token
+      spotify_expires_in
     }
   }
 }

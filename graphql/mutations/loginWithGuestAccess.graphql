@@ -1,0 +1,6 @@
+mutation LoginWithGuestAccess {
+  loginWithGuestAccess {
+    spotify_access_token
+    spotify_expires_in
+  }
+}

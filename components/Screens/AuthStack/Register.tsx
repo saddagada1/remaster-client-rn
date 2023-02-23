@@ -6,7 +6,7 @@ import Container from "../../Container/Container";
 import TypographyBold from "../../Typography/TypographyBold";
 import Typography from "../../Typography/Typography";
 import BackHeader from "../../Header/BackHeader";
-import Icon from "react-native-vector-icons/AntDesign";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import Title from "../../Typography/Title";
 import { Formik, FormikHelpers } from "formik";
 import * as yup from "yup";
@@ -19,7 +19,7 @@ import { setAuthentication } from "../../../redux/slices/authSlice";
 import { setAuthKeys } from "../../../utils/secureStore";
 import { toErrorMap } from "../../../utils/toErrorMap";
 import { useAppDispatch } from "../../../utils/hooks/reduxHooks";
-import { calcExpiresIn } from "../../../utils/calcExpiresIn";
+import { calcExpiresIn } from "../../../utils/calc";
 
 interface RegisterValues {
   username: string;
@@ -42,9 +42,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
       <BackHeader />
       <View className="w-[90%] flex-1 my-10 justify-center">
         <TypographyBold>Welcome Aboard!</TypographyBold>
-        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>
-          sign up
-        </Title>
+        <Title style={{ fontSize: 30, textTransform: "uppercase" }}>sign up</Title>
         <Formik
           initialValues={{
             email: "",
@@ -54,14 +52,8 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
           }}
           validationSchema={yup.object().shape({
             email: yup.string().email("Invalid Format").required("Required"),
-            username: yup
-              .string()
-              .min(5, "Min 5 Chars Required")
-              .required("Required"),
-            password: yup
-              .string()
-              .min(8, "Min 8 Chars Required")
-              .required("Required"),
+            username: yup.string().min(5, "Min 5 Chars Required").required("Required"),
+            password: yup.string().min(8, "Min 8 Chars Required").required("Required"),
             confirmPassword: yup
               .string()
               .oneOf([yup.ref("password"), null], "Entries Do Not Match"),
@@ -80,25 +72,26 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
             const response = await register(request);
             if (response.data?.register.errors) {
               setErrors(toErrorMap(response.data.register.errors));
-            } else if (
-              response.data?.register.auth &&
-              response.data.register.user
-            ) {
+            } else if (response.data?.register.auth && response.data?.register.user) {
               await setAuthKeys({
                 access_token: response.data.register.auth.access_token,
                 refresh_token: response.data.register.auth.refresh_token,
                 expires_in: response.data.register.auth.expires_in,
                 user: response.data.register.user,
+                spotify_access_token: response.data.register.spotify_auth?.spotify_access_token,
+                spotify_expires_in: response.data.register.spotify_auth?.spotify_expires_in,
               });
               dispatch(
                 setAuthentication({
                   isAuthenticated: true,
                   access_token: response.data.register.auth.access_token,
                   refresh_token: response.data.register.auth.refresh_token,
-                  expires_in: calcExpiresIn(
-                    response.data.register.auth.expires_in
-                  ),
+                  expires_in: calcExpiresIn(response.data.register.auth.expires_in),
                   user: response.data.register.user,
+                  spotify_access_token: response.data.register.spotify_auth?.spotify_access_token,
+                  spotify_expires_in: response.data.register.spotify_auth?.spotify_expires_in
+                    ? calcExpiresIn(response.data.register.spotify_auth.spotify_expires_in)
+                    : null,
                 })
               );
               navigation.replace("VerifyEmail");
@@ -115,19 +108,15 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
             setFieldTouched,
             isSubmitting,
           }) => (
-            <View className="w-full mt-6 mb-10">
+            <View className="w-full my-10">
               <View className="flex-row items-center justify-between mb-2 px-1">
-                <TypographyBold style={{ fontSize: 15 }}>
-                  Username
-                </TypographyBold>
+                <TypographyBold style={{ fontSize: 15 }}>Username</TypographyBold>
                 {touched.username && errors.username && (
-                  <Typography className="text-red-800">
-                    {errors.username}
-                  </Typography>
+                  <Typography className="text-red-800">{errors.username}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-5">
-                <Icon name="meh" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-5">
+                <AntDesign name="meh" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("username")}
@@ -138,19 +127,18 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   value={values.username}
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="e.g. xs3-_-crafty"
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
                 <TypographyBold style={{ fontSize: 15 }}>Email</TypographyBold>
                 {touched.email && errors.email && (
-                  <Typography className="text-red-800">
-                    {errors.email}
-                  </Typography>
+                  <Typography className="text-red-800">{errors.email}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-5">
-                <Icon name="mail" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-5">
+                <AntDesign name="mail" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("email")}
@@ -161,21 +149,19 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   value={values.email}
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="remaster@acme.com"
+                  keyboardType="email-address"
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
-                <TypographyBold style={{ fontSize: 15 }}>
-                  Password
-                </TypographyBold>
+                <TypographyBold style={{ fontSize: 15 }}>Password</TypographyBold>
                 {touched.password && errors.password && (
-                  <Typography className="text-red-800">
-                    {errors.password}
-                  </Typography>
+                  <Typography className="text-red-800">{errors.password}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-5">
-                <Icon name="key" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-5">
+                <AntDesign name="key" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("password")}
@@ -187,21 +173,18 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="########"
                   secureTextEntry={true}
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>
               <View className="flex-row items-center justify-between mb-2 px-1">
-                <TypographyBold style={{ fontSize: 15 }}>
-                  Confirm Password
-                </TypographyBold>
-                {errors.confirmPassword && (
-                  <Typography className="text-red-800">
-                    {errors.confirmPassword}
-                  </Typography>
+                <TypographyBold style={{ fontSize: 15 }}>Confirm Password</TypographyBold>
+                {errors.confirmPassword && touched.confirmPassword && (
+                  <Typography className="text-red-800">{errors.confirmPassword}</Typography>
                 )}
               </View>
-              <View className="flex-row items-center border-2 border-black rounded-2xl p-3 mb-12">
-                <Icon name="key" size={25} />
+              <View className="flex-row bg-stone-300 items-center border-2 border-black rounded-2xl p-3 mb-12">
+                <AntDesign name="key" size={25} />
                 <TextInput
                   className="ml-3 flex-1"
                   onChangeText={handleChange("confirmPassword")}
@@ -213,6 +196,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
                   style={{ fontFamily: "Inter", fontSize: 15 }}
                   placeholder="########"
                   secureTextEntry={true}
+                  autoCorrect={false}
                   allowFontScaling={false}
                 />
               </View>
@@ -235,9 +219,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
         <View className="w-full flex-row justify-center">
           <Typography>Already have an account?</Typography>
           <Pressable onPress={() => navigation.navigate("Login")}>
-            <TypographyBold
-              style={{ marginLeft: 5, textDecorationLine: "underline" }}
-            >
+            <TypographyBold style={{ marginLeft: 5, textDecorationLine: "underline" }}>
               Login
             </TypographyBold>
           </Pressable>

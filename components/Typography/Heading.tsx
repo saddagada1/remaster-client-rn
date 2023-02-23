@@ -1,19 +1,14 @@
-import { StyleProp, Text, TextStyle } from "react-native";
+import { StyleProp, Text, TextProps, TextStyle } from "react-native";
 import React from "react";
 
-interface HeadingProps {
+interface HeadingProps extends TextProps {
   children: React.ReactNode;
   style?: StyleProp<TextStyle>;
-  className?: string;
 }
 
-const Heading: React.FC<HeadingProps> = ({ children, style, className }) => {
+const Heading: React.FC<HeadingProps> = ({ children, style, ...TextProps }) => {
   return (
-    <Text
-      allowFontScaling={false}
-      className={className}
-      style={[{ fontFamily: "Syne" }, style]}
-    >
+    <Text allowFontScaling={false} {...TextProps} style={[{ fontFamily: "Syne" }, style]}>
       {children}
     </Text>
   );
