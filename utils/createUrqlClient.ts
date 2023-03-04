@@ -59,6 +59,7 @@ const getAuth: AuthConfig<UrqlAuthState>["getAuth"] = async ({ authState }) => {
     const values = selectUrqlAuthState(state);
     if (values.access_token && values.refresh_token && values.expires_in) {
       console.log("auth state set");
+      console.log(toBase64String(values.access_token));
       return {
         access_token: values.access_token,
         refresh_token: values.refresh_token,
@@ -174,6 +175,7 @@ const didAuthError: AuthConfig<UrqlAuthState>["didAuthError"] = ({ error }) => {
     "auth error: ",
     error.graphQLErrors.some((e) => e.message === "Not Authenticated")
   );
+  console.log(error);
   return error.graphQLErrors.some((e) => e.message === "Not Authenticated");
 };
 

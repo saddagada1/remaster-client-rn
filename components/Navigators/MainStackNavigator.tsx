@@ -7,7 +7,7 @@ import CoreTabsNavigator, { CoreTabsParams } from "./CoreTabsNavigator";
 export type MainStackParams = {
   CoreTabs: NavigatorScreenParams<CoreTabsParams>;
   CreateInit: undefined;
-  CreateComp: { name: string; playbackURL: string; artist: string };
+  CreateComp: { name: string; videoID: string; duration: number; artist: string };
   Editor: undefined;
 };
 
@@ -19,7 +19,7 @@ const MainStackNavigator: React.FC = () => {
       <MainStack.Screen name="CoreTabs" component={CoreTabsNavigator} />
       <MainStack.Screen name="CreateInit" component={CreateInit} />
       <MainStack.Screen name="CreateComp" component={CreateComp} />
-      <MainStack.Screen name="Editor" component={Editor} />
+      <MainStack.Screen name="Editor" component={Editor} options={{ gestureEnabled: false }} />
     </MainStack.Navigator>
   );
 };

@@ -1,34 +1,30 @@
-import { View, ScrollView, NativeScrollEvent } from "react-native";
+import { View, ScrollView } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import Resizeable from "../Resizeable/Resizeable";
 import Ruler from "../Ruler/Ruler";
-import { Loop } from "../../utils/types/remaster";
-import { keyColourReference } from "../../utils/constants";
 import TypographyBold from "../Typography/TypographyBold";
 import Animated, { useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
 import { calcVideoTimestamp } from "../../utils/calc";
+import { useAppSelector } from "../../utils/hooks/reduxHooks";
 
 interface TimelineProps {
-  duration: number;
   playing: boolean;
   progressPosition: number;
   segmentWidth: number;
   unit: number;
   containerWidth: number;
-  loops: Loop[];
 }
 
 const Timeline: React.FC<TimelineProps> = ({
-  duration,
   playing,
   progressPosition,
   segmentWidth,
   unit,
   containerWidth,
-  loops,
 }) => {
+  const state = useAppSelector((store) => store.editor);
   const snapTo = unit + segmentWidth;
-  const sliderWidth = duration * snapTo + segmentWidth;
+  const sliderWidth = state.duration * snapTo + segmentWidth;
   const scrollRef = useRef<ScrollView | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [resizePosition, setResizePosition] = useState(0);
@@ -86,7 +82,7 @@ const Timeline: React.FC<TimelineProps> = ({
         onScroll={({ nativeEvent }) => {
           const position = Math.round(nativeEvent.contentOffset.x / snapTo);
           setScrollPosition(position);
-          if (position === 0 || duration - position * snapTo === containerWidth) {
+          if (position === 0 || state.duration - position * snapTo === containerWidth) {
             setShowScrollDisplay(false);
           }
         }}
@@ -102,13 +98,13 @@ const Timeline: React.FC<TimelineProps> = ({
           <View className="h-1/5">
             <Ruler
               segmentWidth={segmentWidth}
-              numOfSegments={duration}
+              numOfSegments={state.duration}
               unit={unit}
               width={sliderWidth}
             />
           </View>
           <View className="flex-row-reverse justify-end flex-1">
-            {loops
+            {state.loops
               .slice(0)
               .reverse()
               .map((loop) => (
@@ -122,7 +118,7 @@ const Timeline: React.FC<TimelineProps> = ({
                   }
                   onResizeEnd={() => setShowResizeDisplay(false)}
                   style={{
-                    backgroundColor: `${keyColourReference[loop.key]}80`,
+                    backgroundColor: `${loop.key.colour}80`,
                   }}
                 />
               ))}

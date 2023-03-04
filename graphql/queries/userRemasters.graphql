@@ -1,0 +1,52 @@
+query UserRemasters {
+  userRemasters {
+    id
+    name
+    artist_id
+    artist {
+      id
+      name
+      created_at
+      updated_at
+    }
+    video_id
+    duration
+    key {
+      id
+      note
+      colour
+    }
+    tuning {
+      id
+      name
+      notes
+    }
+    loops {
+      id
+      name
+      key {
+        id
+        note
+        colour
+      }
+      type
+      start
+      end
+      chord {
+        title
+        fingers
+        barres {
+          fromString
+          toString
+          fret
+        }
+        position
+      }
+      tab
+    }
+    likes
+    creator_id
+    created_at
+    updated_at
+  }
+}

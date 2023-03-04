@@ -33,9 +33,9 @@ const VerifyEmail: React.FC<VerifyEmailProps> = ({ navigation }) => {
   const [, verifyEmail] = useMutation(VerifyEmailDocument);
   const dispatch = useAppDispatch();
   return (
-    <Container>
-      <BackHeader />
-      <View className="w-[90%] flex-1 my-10 justify-center">
+    <Container className="w-full h-full bg-stone-400 px-8 items-center">
+      <BackHeader className="flex-row mt-10" />
+      <View className="w-full flex-1 my-10 justify-center">
         <TypographyBold>Almost There!</TypographyBold>
         <Title style={{ fontSize: 30, textTransform: "uppercase" }}>verify email</Title>
         <Formik
@@ -98,7 +98,7 @@ const VerifyEmail: React.FC<VerifyEmailProps> = ({ navigation }) => {
               <Pressable
                 onPress={() => handleSubmit()}
                 disabled={isSubmitting}
-                className="flex-row justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
+                className="justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
               >
                 {isSubmitting ? (
                   <LoadingIndicator size={15} colour="#ffffff" />

@@ -39,9 +39,9 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({ navigation,
   const dispatch = useAppDispatch();
 
   return (
-    <Container>
-      <BackHeader />
-      <View className="w-[90%] flex-1 my-10 justify-center">
+    <Container className="w-full h-full bg-stone-400 px-8 items-center">
+      <BackHeader className="flex-row mt-10" />
+      <View className="w-full flex-1 my-10 justify-center">
         <TypographyBold>Problem Solved!</TypographyBold>
         <Title style={{ fontSize: 30, textTransform: "uppercase" }}>forgot password</Title>
         <View className="bg-green-300 rounded-xl items-center justify-center mt-5 p-2">
@@ -197,7 +197,7 @@ const ChangeForgotPassword: React.FC<ChangeForgotPasswordProps> = ({ navigation,
               <Pressable
                 onPress={() => handleSubmit()}
                 disabled={isSubmitting}
-                className="flex-row justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
+                className="justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
               >
                 {isSubmitting ? (
                   <LoadingIndicator size={15} colour="#ffffff" />

@@ -1,16 +1,13 @@
-import { View } from "react-native";
 import React, { useEffect } from "react";
 import LoadingIndicator from "../Visualizations/LoadingIndicator";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParams } from "../Navigators/RootStackNavigator";
 import { useAppDispatch } from "../../utils/hooks/reduxHooks";
-import {
-  resetAuthentication,
-  setAuthentication,
-} from "../../redux/slices/authSlice";
+import { resetAuthentication, setAuthentication } from "../../redux/slices/authSlice";
 import { getAuthKeys } from "../../utils/secureStore";
 import { sleep } from "../../utils/sleep";
+import Container from "../Container/Container";
 
 type LoadingProps = CompositeScreenProps<
   NativeStackScreenProps<RootStackParams, "Loading">,
@@ -51,9 +48,9 @@ const Loading: React.FC<LoadingProps> = ({ navigation }) => {
   }, []);
 
   return (
-    <View className="w-full h-full bg-stone-400 items-center justify-center">
+    <Container className="w-full h-full bg-stone-400 items-center justify-center">
       <LoadingIndicator size={30} colour="#000000" />
-    </View>
+    </Container>
   );
 };
 

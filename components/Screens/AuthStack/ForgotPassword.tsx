@@ -15,6 +15,7 @@ import { CompositeScreenProps } from "@react-navigation/native";
 import { RootStackParams } from "../../Navigators/RootStackNavigator";
 import { useMutation } from "urql";
 import { ForgotPasswordDocument } from "../../../generated/graphql";
+import { trimString } from "../../../utils/helpers";
 
 interface ForgotPasswordValues {
   email: string;
@@ -28,9 +29,9 @@ type ForgotPasswordProps = CompositeScreenProps<
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ navigation }) => {
   const [, forgotPassword] = useMutation(ForgotPasswordDocument);
   return (
-    <Container>
-      <BackHeader />
-      <View className="w-[90%] flex-1 my-10 justify-center">
+    <Container className="w-full h-full bg-stone-400 px-8 items-center">
+      <BackHeader className="flex-row mt-10" />
+      <View className="w-full flex-1 my-10 justify-center">
         <TypographyBold>Mistakes Made!</TypographyBold>
         <Title style={{ fontSize: 30, textTransform: "uppercase" }}>forgot password</Title>
         <Formik
@@ -39,7 +40,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ navigation }) => {
             email: yup.string().email("Invalid Format").required("Required"),
           })}
           onSubmit={async (values: ForgotPasswordValues) => {
-            await forgotPassword(values);
+            await forgotPassword({ email: trimString(values.email) });
             navigation.replace("ChangeForgotPassword", { email: values.email });
           }}
         >
@@ -80,7 +81,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ navigation }) => {
               <Pressable
                 onPress={() => handleSubmit()}
                 disabled={isSubmitting}
-                className="flex-row justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
+                className="justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
               >
                 {isSubmitting ? (
                   <LoadingIndicator size={15} colour="#ffffff" />

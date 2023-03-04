@@ -5,12 +5,12 @@ mutation VerifyEmail($token: String!) {
       message
     }
     user {
-      _id
+      id
       verified
       email
       username
-      createdAt
-      updatedAt
+      created_at
+      updated_at
     }
   }
 }

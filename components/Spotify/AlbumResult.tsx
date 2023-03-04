@@ -4,8 +4,7 @@ import { AlbumObjectSimplified } from "../../utils/types/spotify";
 import TypographyBold from "../Typography/TypographyBold";
 import Entypo from "@expo/vector-icons/Entypo";
 import Typography from "../Typography/Typography";
-import { keyColourReference } from "../../utils/constants";
-import { randKeys } from "../../utils/rand";
+import { keyReference } from "../../utils/constants";
 import Portal from "../Visualizations/Portal";
 
 interface AlbumResultProps {
@@ -26,7 +25,7 @@ const AlbumResult: React.FC<AlbumResultProps> = ({ album }) => {
             source={{ uri: image.url }}
           />
         ) : (
-          <Portal width={100} height={100} keys={randKeys(keyColourReference, 4)} animate={false} />
+          <Portal width={100} height={100} keys={keyReference} animate={false} />
         )}
       </View>
       <View className="py-[6] pr-2 ml-2 justify-between">

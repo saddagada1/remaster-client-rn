@@ -25,8 +25,8 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
     requestPolicy: "network-only",
   });
   return (
-    <Container noPadding={true}>
-      <Header title="home" />
+    <Container className="w-full h-full bg-stone-400 items-center">
+      <Header className="w-full px-4 pt-10" title="home" />
       <View className="flex-1 justify-center items-center">
         <Pressable onPress={() => reexecuteQuery()}>
           {data && data.users ? (
@@ -36,9 +36,9 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
               data.users.map((user, index) => (
                 <Title
                   key={index}
-                  className={loggedUser?._id === user._id ? "text-red-500" : undefined}
+                  className={loggedUser?.id === user.id ? "text-red-500" : undefined}
                 >
-                  {user._id + ":" + user.username + ":" + user.verified}
+                  {user.id + ":" + user.username + ":" + user.verified}
                 </Title>
               ))
             )

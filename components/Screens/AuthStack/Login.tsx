@@ -23,6 +23,7 @@ import { calcExpiresIn } from "../../../utils/calc";
 import * as Google from "expo-auth-session/providers/google";
 import { GOOGLE_OAUTH_CLIENT_ID } from "@env";
 import { toBase64String } from "../../../utils/toBase64String";
+import { trimString } from "../../../utils/helpers";
 
 interface LoginValues {
   email: string;
@@ -97,9 +98,9 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
   }, [response]);
 
   return (
-    <Container>
-      <BackHeader />
-      <View className="w-[90%] flex-1 my-10 justify-center">
+    <Container className="w-full h-full bg-stone-400 px-8 items-center">
+      <BackHeader className="flex-row mt-10" />
+      <View className="w-full flex-1 my-10 justify-center">
         <TypographyBold>Welcome Back!</TypographyBold>
         <Title style={{ fontSize: 30, textTransform: "uppercase" }}>login</Title>
         <Formik
@@ -108,7 +109,9 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             email: yup.string().email("Invalid Format").required("Required"),
           })}
           onSubmit={async (values: LoginValues, { setErrors }: FormikHelpers<LoginValues>) => {
-            const response = await login({ loginOptions: values });
+            const response = await login({
+              loginOptions: { email: trimString(values.email), password: values.password },
+            });
             if (response.data?.login.errors) {
               setErrors(toErrorMap(response.data.login.errors));
             } else if (response.data?.login.auth && response.data?.login.user) {
@@ -208,7 +211,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
               <Pressable
                 onPress={() => handleSubmit()}
                 disabled={isSubmitting}
-                className="flex-row justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
+                className="justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
               >
                 {isSubmitting ? (
                   <LoadingIndicator size={15} colour="#ffffff" />

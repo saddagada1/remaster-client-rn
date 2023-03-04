@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Svg, { G, Line, Text, Circle, Rect } from "react-native-svg";
-import { Chord as ChordType } from "../../utils/types/remaster";
+import { Chord as ChordType } from "../../generated/graphql";
 
 interface ChordProps {
   chord: ChordType;
@@ -147,7 +147,7 @@ const Chord: React.FC<ChordProps> = ({
               </Text>
             ))}
             {chord.fingers.map((finger, index) =>
-              finger[1] !== 0 && finger[1] !== "x" ? (
+              finger[1] !== 0 && finger[1] !== -1 ? (
                 <Circle
                   key={index}
                   r={itemWidth}
@@ -180,7 +180,7 @@ const Chord: React.FC<ChordProps> = ({
               ) : null
             )}
             {chord.fingers.map((finger, index) =>
-              finger[1] === "x" ? (
+              finger[1] === -1 ? (
                 <G key={index}>
                   <Line
                     x1={diagramPadding.paddingX * 0.25}

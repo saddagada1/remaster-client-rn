@@ -5,7 +5,7 @@ import Title from "../../Typography/Title";
 import TypographyBold from "../../Typography/TypographyBold";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Portal from "../../Visualizations/Portal";
-import { keyColourReference } from "../../../utils/constants";
+import { keyReference } from "../../../utils/constants";
 import Typography from "../../Typography/Typography";
 import Animated, {
   useSharedValue,
@@ -40,7 +40,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
   const [portalHeight, setPortalHeight] = useState(0);
   const uiRevealTranslateY = useSharedValue(50);
   const uiRevealOpacity = useSharedValue(0);
-  const portalRevealTranslateX = useSharedValue(0);
+  const portalRevealTranslateX = useSharedValue(50);
   const portalRevealScaleY = useSharedValue(1);
   const portalRevealOpacity = useSharedValue(0);
 
@@ -60,19 +60,15 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
 
   const portalRevealLeftAnimStyles = useAnimatedStyle(() => {
     return {
-      transform: [
-        { translateX: portalRevealTranslateX.value * -1 },
-        { scaleY: portalRevealScaleY.value },
-      ],
+      right: `${portalRevealTranslateX.value}%`,
+      transform: [{ scaleY: portalRevealScaleY.value }],
     };
   });
 
   const portalRevealRightAnimStyles = useAnimatedStyle(() => {
     return {
-      transform: [
-        { translateX: portalRevealTranslateX.value },
-        { scaleY: portalRevealScaleY.value },
-      ],
+      left: `${portalRevealTranslateX.value}%`,
+      transform: [{ scaleY: portalRevealScaleY.value }],
     };
   });
 
@@ -83,10 +79,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
   });
 
   useEffect(() => {
-    uiRevealTranslateY.value = withDelay(1000, withSpring(0));
-    uiRevealOpacity.value = withDelay(1000, withSpring(1));
     portalRevealTranslateX.value = withDelay(
-      2000,
+      1000,
       withTiming(100, { duration: 1000 }, () => {
         portalRevealScaleY.value = withTiming(
           0,
@@ -96,6 +90,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
           },
           () => {
             portalRevealOpacity.value = withTiming(1, { duration: 1000 });
+            uiRevealTranslateY.value = withSpring(0);
+            uiRevealOpacity.value = withSpring(1);
           }
         );
       })
@@ -124,39 +120,45 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
 
   return (
-    <Container>
+    <Container className="w-full h-full bg-stone-400 px-8 items-center">
       <Animated.View className="my-10" style={uiRevealTopAnimStyles}>
         <TypographyBold>Welcome To</TypographyBold>
         <Title style={{ fontSize: 30, textTransform: "uppercase" }}>remaster</Title>
       </Animated.View>
-      <View className="w-full flex-1 flex-row justify-center mb-2">
+      <View
+        style={{ width: portalWidth === 0 ? "100%" : portalWidth - 16 }}
+        className="flex-1 flex-row mb-2 justify-center relative"
+      >
         <View
-          className="w-[60%] h-full absolute border-2 border-black rounded-2xl overflow-hidden"
+          className="aspect-[3/5] h-full border-2 border-black rounded-2xl overflow-hidden"
           onLayout={(event) => {
             setPortalWidth(event.nativeEvent.layout.width);
             setPortalHeight(event.nativeEvent.layout.height);
           }}
         >
           <Animated.View className="w-full h-full" style={portalRevealAnimStyles}>
-            {portalWidth && portalHeight ? (
+            {portalWidth !== 0 && portalHeight !== 0 ? (
               <Portal
                 width={portalWidth}
                 height={portalHeight}
-                keys={Object.keys(keyColourReference)}
+                keys={keyReference}
                 animate={isFocused}
               />
             ) : null}
           </Animated.View>
         </View>
-        <Animated.View className="w-[30%] h-full bg-stone-400" style={portalRevealLeftAnimStyles} />
         <Animated.View
-          className="w-[30%] h-full bg-stone-400"
-          style={portalRevealRightAnimStyles}
+          className="h-full absolute bg-stone-400"
+          style={[portalRevealLeftAnimStyles, { width: portalWidth === 0 ? "100%" : portalWidth }]}
+        />
+        <Animated.View
+          className="h-full absolute bg-stone-400"
+          style={[portalRevealRightAnimStyles, { width: portalWidth === 0 ? "100%" : portalWidth }]}
         />
       </View>
       <Animated.View className="w-full items-center my-10" style={uiRevealBottomAnimStyles}>
         <Pressable
-          className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black"
+          className="w-full flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-black border-2 border-black"
           onPress={() => navigation.navigate("Register")}
         >
           <AntDesign name="mail" size={20} color="#ffffff" />
@@ -165,7 +167,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ navigation }) => {
           </TypographyBold>
         </Pressable>
         <Pressable
-          className="w-[90%] flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-stone-300 border-2 border-black"
+          className="w-full flex-row justify-center items-center p-5 mb-5 rounded-2xl bg-stone-300 border-2 border-black"
           disabled={!request}
           onPress={() => {
             promptAsync();

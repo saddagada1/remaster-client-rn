@@ -5,12 +5,12 @@ mutation Login($loginOptions: LoginInput!) {
       message
     }
     user {
-      _id
+      id
       verified
       email
       username
-      createdAt
-      updatedAt
+      created_at
+      updated_at
     }
     auth {
       access_token

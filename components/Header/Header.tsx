@@ -1,14 +1,14 @@
-import { View } from "react-native";
+import { View, ViewProps } from "react-native";
 import React from "react";
 import Title from "../Typography/Title";
 
-interface HeaderProps {
+interface HeaderProps extends ViewProps {
   title: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ title }) => {
+const Header: React.FC<HeaderProps> = ({ title, ...ViewProps }) => {
   return (
-    <View className="w-full px-4 pt-10">
+    <View {...ViewProps}>
       <Title style={{ fontSize: 30, textTransform: "uppercase" }}>{title}</Title>
     </View>
   );

@@ -1,24 +1,16 @@
-import { View } from "react-native";
+import { StyleProp, View, ViewProps, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React from "react";
 
-interface ContainerProps {
+interface ContainerProps extends ViewProps {
   children: React.ReactNode;
-  noPadding?: boolean;
-  bottomInset?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
-const Container: React.FC<ContainerProps> = ({ children, noPadding, bottomInset }) => {
+const Container: React.FC<ContainerProps> = ({ children, style, ...ViewProps }) => {
   const insets = useSafeAreaInsets();
   return (
-    <View
-      style={{ paddingTop: insets.top, paddingBottom: bottomInset ? insets.bottom : undefined }}
-      className={
-        noPadding
-          ? "w-full h-full bg-stone-400 items-center"
-          : "w-full h-full bg-stone-400 p-4 items-center"
-      }
-    >
+    <View {...ViewProps} style={[{ paddingTop: insets.top }, style]}>
       {children}
     </View>
   );

@@ -1,5 +1,4 @@
 import { LayoutChangeEvent, Pressable, View } from "react-native";
-import Icon from "react-native-vector-icons/AntDesign";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useState } from "react";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";

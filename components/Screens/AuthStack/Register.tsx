@@ -20,6 +20,7 @@ import { setAuthKeys } from "../../../utils/secureStore";
 import { toErrorMap } from "../../../utils/toErrorMap";
 import { useAppDispatch } from "../../../utils/hooks/reduxHooks";
 import { calcExpiresIn } from "../../../utils/calc";
+import { trimString } from "../../../utils/helpers";
 
 interface RegisterValues {
   username: string;
@@ -36,11 +37,10 @@ type RegisterProps = CompositeScreenProps<
 const Register: React.FC<RegisterProps> = ({ navigation }) => {
   const [, register] = useMutation(RegisterDocument);
   const dispatch = useAppDispatch();
-
   return (
-    <Container>
-      <BackHeader />
-      <View className="w-[90%] flex-1 my-10 justify-center">
+    <Container className="w-full h-full bg-stone-400 px-8 items-center">
+      <BackHeader className="flex-row mt-10" />
+      <View className="w-full flex-1 my-10 justify-center">
         <TypographyBold>Welcome Aboard!</TypographyBold>
         <Title style={{ fontSize: 30, textTransform: "uppercase" }}>sign up</Title>
         <Formik
@@ -52,7 +52,12 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
           }}
           validationSchema={yup.object().shape({
             email: yup.string().email("Invalid Format").required("Required"),
-            username: yup.string().min(5, "Min 5 Chars Required").required("Required"),
+            username: yup
+              .string()
+              .min(5, "Min 5 Chars Required")
+              .matches(/^[A-Za-z0-9_-]*$/, "Invalid: A-Z, 0-9, - and _ Only")
+              .max(20, "Max 20 Chars")
+              .required("Required"),
             password: yup.string().min(8, "Min 8 Chars Required").required("Required"),
             confirmPassword: yup
               .string()
@@ -65,7 +70,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
             const request = {
               registerOptions: {
                 username: values.username,
-                email: values.email,
+                email: trimString(values.email),
                 password: values.password,
               },
             };
@@ -203,7 +208,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
               <Pressable
                 onPress={() => handleSubmit()}
                 disabled={isSubmitting}
-                className="flex-row justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
+                className="justify-center items-center p-5 rounded-2xl bg-black border-2 border-black"
               >
                 {isSubmitting ? (
                   <LoadingIndicator size={15} colour="#ffffff" />

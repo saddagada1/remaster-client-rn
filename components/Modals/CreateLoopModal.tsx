@@ -8,11 +8,14 @@ import TypographyBold from "../Typography/TypographyBold";
 import LoadingIndicator from "../Visualizations/LoadingIndicator";
 import * as yup from "yup";
 import Select from "../Select/Select";
-import { keyColourReference } from "../../utils/constants";
+import { keyReference } from "../../utils/constants";
+import { useAppDispatch } from "../../utils/hooks/reduxHooks";
+import { createLoop } from "../../redux/slices/editorSlice";
+import { KeyInput } from "../../generated/graphql";
 
 interface CreateLoopValues {
   name: string;
-  key: string;
+  key: KeyInput;
   type: string;
 }
 
@@ -22,17 +25,20 @@ interface CreateLoopModalProps {
 }
 
 const CreateLoopModal: React.FC<CreateLoopModalProps> = ({ trigger, setTrigger }) => {
+  const dispatch = useAppDispatch();
+
   return (
     <Modal animationType="fade" transparent={true} visible={trigger}>
       <View className="flex-1 bg-black/50 justify-center items-center">
         <View className="w-3/4 p-4 items-center bg-stone-400 border-2 border-black rounded-2xl">
           <Heading style={{ fontSize: 25 }}>Create Loop</Heading>
           <Formik
-            initialValues={{ name: "", key: "C Major", type: "Chord" }}
+            initialValues={{ name: "", key: keyReference[0], type: "Chord" }}
             validationSchema={yup.object().shape({
               name: yup.string().required("Required"),
             })}
             onSubmit={(values: CreateLoopValues) => {
+              dispatch(createLoop(values));
               setTrigger(false);
             }}
           >
@@ -75,12 +81,10 @@ const CreateLoopModal: React.FC<CreateLoopModalProps> = ({ trigger, setTrigger }
                   Key
                 </TypographyBold>
                 <Select
-                  data={Object.keys(keyColourReference).flatMap((key) => {
-                    return [key + " Major", key + " Minor"];
-                  })}
-                  onSelect={(value) => setFieldValue("key", value)}
+                  data={keyReference.map((key) => key.note)}
+                  onSelect={(_, index) => setFieldValue("key", keyReference[index])}
                   icon={<AntDesign name="key" size={25} />}
-                  value={values.key}
+                  value={values.key.note}
                   containerClassName="z-20"
                   boxClassName="bg-stone-300 border-2 border-black rounded-2xl p-3 mb-5"
                   dropdownClassName="bg-stone-300 border-2 border-black rounded-2xl px-3 h-[200]"
@@ -92,7 +96,7 @@ const CreateLoopModal: React.FC<CreateLoopModalProps> = ({ trigger, setTrigger }
                 <Select
                   data={["Chord", "Tab"]}
                   onSelect={(value) => setFieldValue("type", value)}
-                  icon={<AntDesign name="eyeo" size={25} />}
+                  icon={<AntDesign name="flag" size={25} />}
                   value={values.type}
                   containerClassName="z-10"
                   boxClassName="bg-stone-300 border-2 border-black rounded-2xl p-3 mb-7"

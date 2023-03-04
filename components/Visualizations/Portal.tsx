@@ -11,20 +11,23 @@ import {
   SkiaMutableValue,
   runTiming,
   Rect,
-  SweepGradient,
   SkiaAnimation,
+  LinearGradient,
 } from "@shopify/react-native-skia";
-import { keyColourReference } from "../../utils/constants";
 import { rand } from "../../utils/rand";
 
 interface PortalProps {
   width: number;
   height: number;
-  keys: string[];
+  radius?: number;
+  keys: {
+    note: string;
+    colour: string;
+  }[];
   animate: boolean;
 }
 
-const Portal: React.FC<PortalProps> = ({ width, height, keys, animate }) => {
+const Portal: React.FC<PortalProps> = ({ width, height, radius, keys, animate }) => {
   const circlePositions = keys.map(() => {
     const circleXPosition = useValue(rand(0, width));
     const circleYPosition = useValue(rand(0, height));
@@ -32,10 +35,7 @@ const Portal: React.FC<PortalProps> = ({ width, height, keys, animate }) => {
   });
   const radialPositions = keys.map((_, index) => {
     const radialPosition = useComputedValue(() => {
-      return vec(
-        circlePositions[index][0].current,
-        circlePositions[index][1].current
-      );
+      return vec(circlePositions[index][0].current, circlePositions[index][1].current);
     }, [circlePositions[index][0], circlePositions[index][1]]);
     return radialPosition;
   });
@@ -46,7 +46,7 @@ const Portal: React.FC<PortalProps> = ({ width, height, keys, animate }) => {
     const timing = runTiming(
       x,
       { to: randomX, loop: true, yoyo: true },
-      { duration: Math.abs(((x.current - randomX) / 10) * 1000) },
+      { duration: Math.abs(((x.current - randomX) / 10) * 1000) }
     );
 
     return timing;
@@ -57,7 +57,7 @@ const Portal: React.FC<PortalProps> = ({ width, height, keys, animate }) => {
     const timing = runTiming(
       y,
       { to: randomY, loop: true, yoyo: true },
-      { duration: Math.abs(((y.current - randomY) / 10) * 1000) },
+      { duration: Math.abs(((y.current - randomY) / 10) * 1000) }
     );
 
     return timing;
@@ -74,10 +74,11 @@ const Portal: React.FC<PortalProps> = ({ width, height, keys, animate }) => {
         })
       );
     } else {
-      timings.length !== 0 && timings.map((timing) => {
-        timing[0].cancel();
-        timing[1].cancel();
-      });
+      timings.length !== 0 &&
+        timings.map((timing) => {
+          timing[0].cancel();
+          timing[1].cancel();
+        });
       setTimings([]);
     }
   }, [animate]);
@@ -90,24 +91,22 @@ const Portal: React.FC<PortalProps> = ({ width, height, keys, animate }) => {
             <Circle
               cx={circlePositions[index][0]}
               cy={circlePositions[index][1]}
-              r={width * 0.5}
+              r={!radius ? width * 0.5 : radius}
               key={index}
             >
               <RadialGradient
                 c={radialPositions[index]}
-                r={width * 0.5}
-                colors={[
-                  keyColourReference[key],
-                  keyColourReference[key] + "00",
-                ]}
+                r={!radius ? width * 0.5 : radius}
+                colors={[key.colour, key.colour + "00"]}
               />
             </Circle>
           ))}
           <Rect x={0} y={0} width={width} height={height}>
-            <SweepGradient
-              c={vec(width / 2, height / 2)}
+            <LinearGradient
+              start={vec(width / 2, 0)}
+              end={vec(width / 2, height)}
               colors={keys.map((key) => {
-                return keyColourReference[key] + "80";
+                return key.colour + "80";
               })}
             />
           </Rect>

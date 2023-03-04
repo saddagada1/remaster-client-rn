@@ -29,8 +29,8 @@ const Explore: React.FC<ExploreProps> = ({ navigation }) => {
   const [selectedFilter, setSelectedFilter] = useState("All");
 
   return (
-    <Container noPadding={true}>
-      <Header title="explore" />
+    <Container className="w-full h-full bg-stone-400 items-center">
+      <Header className="w-full px-4 pt-10" title="explore" />
       <View className="flex-row mt-2 mx-4 bg-stone-300 items-center border-2 border-black rounded-2xl p-3">
         <AntDesign name="search1" size={25} />
         <TextInput
@@ -56,8 +56,8 @@ const Explore: React.FC<ExploreProps> = ({ navigation }) => {
               }}
               className={
                 filter === selectedFilter
-                  ? "rounded-2xl px-8 py-3 bg-black border-2 border-black"
-                  : "rounded-2xl px-8 py-3 bg-stone-400 border-2 border-black"
+                  ? "rounded-xl px-8 py-3 bg-black border-2 border-black"
+                  : "rounded-xl px-8 py-3 bg-stone-400 border-2 border-black"
               }
               onPress={() => setSelectedFilter(filter)}
             >
